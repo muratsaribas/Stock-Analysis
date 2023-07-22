@@ -1,0 +1,65 @@
+<ng-content [select]="tableTitle"></ng-content>
+
+<div class="relative w-full overflow-x-auto">
+  <ng-container *ngIf="skeleton; else tableTemplate">
+    <table class="w-full text-sm text-left text-gray-500">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+        <tr>
+          <th
+            *ngFor="let item of [0, 1, 2, 3]"
+            scope="col"
+            class="px-6 py-3 animate-pulse"
+          ></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of [0, 1, 2, 3]">
+          <td
+            *ngFor="let item of [0, 1, 2, 3]"
+            class="border px-4 py-2 animate-pulse"
+          >
+            <div class="h-4 bg-gray-200 rounded"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+</div>
+
+<ng-template #tableTemplate>
+  <table
+    class="table-fixed border-collapse border border-slate-400 w-full text-sm text-left text-gray-500"
+  >
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <tr>
+        <th scope="col" class="border border-slate-300 px-3 py-2 w-20"></th>
+        <th
+          *ngFor="let date of getTableHead()"
+          scope="col"
+          class="border border-slate-300 px-3 py-2 w-32"
+        >
+          {{ date }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let item of getTableData()"
+        class="bg-white border border-slate-300"
+      >
+        <th
+          scope="row"
+          class="border border-slate-300 px-3 py-2 font-medium text-gray-900 whitespace-nowrap"
+        >
+          {{ item.name }}
+        </th>
+        <td
+          *ngFor="let close of item.data"
+          class="border border-slate-300 px-3 py-2"
+        >
+          {{ close }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
