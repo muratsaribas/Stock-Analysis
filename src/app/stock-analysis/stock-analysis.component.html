@@ -1,0 +1,87 @@
+<div class="container w-full h-full flex py-4 gap-4 flex-col">
+  <div class="card w-full flex flex-wrap items-center justify-between px-4 p-2">
+    <div class="flex items-center flex-wrap gap-4">
+      <mat-form-field class="w-52" [formGroup]="stockForm">
+        <mat-label>Hisse Seçiniz</mat-label>
+        <mat-select formControlName="stocks" multiple>
+          <mat-option *ngFor="let stock of stockList" [value]="stock">{{
+            stock
+          }}</mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="
+            stockForm.get('stocks').invalid &&
+            (stockForm.get('stocks').dirty || stockForm.get('stocks').touched)
+          "
+        >
+          En az 1 seçim yapılmalıdır.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="w-52">
+        <mat-label>Tarih Seçiniz</mat-label>
+        <mat-date-range-input
+          [formGroup]="stockForm"
+          [rangePicker]="picker"
+          [min]="min"
+          [max]="max"
+        >
+          <input
+            (focus)="picker.open()"
+            matStartDate
+            formControlName="start"
+            placeholder="Başlangıç"
+          />
+          <input
+            (focus)="picker.open()"
+            matEndDate
+            formControlName="end"
+            placeholder="Bitiş"
+          />
+        </mat-date-range-input>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-error
+          *ngIf="
+            stockForm.get('start').invalid &&
+            (stockForm.get('start').dirty || stockForm.get('start').touched)
+          "
+        >
+          Başlangıç tarihi gerekli
+        </mat-error>
+        <mat-error
+          *ngIf="
+            stockForm.get('end').invalid &&
+            (stockForm.get('end').dirty || stockForm.get('end').touched)
+          "
+        >
+          Bitiş tarihi gerekli
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <button
+      (click)="show()"
+      [disabled]="!stockForm.valid"
+      mat-raised-button
+      color="primary"
+    >
+      Göster
+    </button>
+  </div>
+
+  <div class="card">
+    <app-vex-chart
+      [options]="options"
+      [series]="series"
+      [skeleton]="isLoading"
+    ></app-vex-chart>
+  </div>
+
+  <div class="card w-full flex items-center justify-between gap-4 flex-col">
+    <app-vex-table class="w-full" [skeleton]="isLoading" [data]="getTableData()">
+      <div tableTitle
+        class="flex w-full py-4 items-center justify-center text-base text-slate-700 font-medium">
+        Hisse Senedi Değerleri ve Tarihleri
+      </div>
+    </app-vex-table>
+  </div>
+</div>
