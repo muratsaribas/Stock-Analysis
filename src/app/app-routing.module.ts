@@ -6,11 +6,30 @@ const routes: Routes = [
   {
     path: "",
     component: CustomLayoutComponent,
-    children: [],
+    children: [
+      {
+        path: '',
+        redirectTo: 'stock-analysis',
+        pathMatch: 'full',
+      },
+      {
+        path: "stock-analysis",
+        title: "Hisse Senedi Analizi",
+        loadComponent: () =>
+          import("./stock-analysis/stock-analysis.component").then(
+            (c) => c.StockAnalysisComponent
+          ),
+      },
+    ],
   },
   {
     path: "**",
-    redirectTo: "",
+    redirectTo: "/stock-analysis",
+  },
+  {
+    path: "",
+    redirectTo: "/stock-analysis",
+    pathMatch: "full",
   },
 ];
 

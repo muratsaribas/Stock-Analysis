@@ -70,6 +70,11 @@
     </button>
   </div> -->
 
+  <div class="flex items-center justify-start gap-2">
+    <mat-icon class="sm:block hidden" svgIcon="mat:home"></mat-icon>
+    <span>Hisse Senedi Analizi</span>
+  </div>
+
 
   <div *ngIf="(isVerticalLayout$ | async) && isNavbarInToolbar$ | async"
        [class.hidden]="mobileQuery"
