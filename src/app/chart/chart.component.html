@@ -1,0 +1,10 @@
+<ng-container *ngIf="skeleton; else chartTemplate">
+  <div class="animate-pulse p-4 w-full h-80 rounded-lg">
+    <div class="h-4 bg-gray-200 rounded-full w-56 mb-4"></div>
+    <div class="h-64 bg-gray-200 rounded-lg w-full mb-4"></div>
+  </div>
+</ng-container>
+
+<ng-template #chartTemplate>
+  <vex-chart [options]="options" [series]="series"></vex-chart>
+</ng-template>
