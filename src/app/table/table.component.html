@@ -2,7 +2,7 @@
 
 <div class="relative w-full overflow-x-auto">
   <ng-container *ngIf="skeleton; else tableTemplate">
-    <table class="w-full text-sm text-left text-gray-500">
+    <table data-testid="skeleton" class="w-full text-sm text-left text-gray-500">
       <thead class="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
           <th
@@ -27,7 +27,7 @@
 </div>
 
 <ng-template #tableTemplate>
-  <table
+  <table data-testid="dataTable"
     class="table-fixed border-collapse border border-slate-400 w-full text-sm text-left text-gray-500"
   >
     <thead class="text-xs text-gray-700 uppercase bg-gray-50">

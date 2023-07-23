@@ -1,31 +1,26 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TableDataModel } from '../models/tableData.model';
+import { Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { TableDataModel } from "../models/tableData.model";
 
 @Component({
-  selector: 'app-vex-table',
+  selector: "app-vex-table",
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  templateUrl: "./table.component.html",
+  styleUrls: ["./table.component.scss"],
 })
-export class AppTableComponent implements OnInit {
-
+export class AppTableComponent {
   @Input() skeleton!: boolean;
 
   @Input() data!: TableDataModel;
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
-
   getTableHead() {
-    return this.data.tableHead;
+    return this.data?.tableHead;
   }
 
   getTableData() {
-    return this.data.tableData;
+    return this.data?.tableData;
   }
-
 }

@@ -4,7 +4,7 @@ export interface Stock {
     "Information"?: string;
 }
 
-interface MetaData {
+export interface MetaData {
     "1. Information": string;
     "2. Symbol": string;
     "3. Last Refreshed": string;
@@ -12,7 +12,7 @@ interface MetaData {
     "5. Time Zone": string;
 }
 
-interface TimeSeries {
+export interface TimeSeries {
     "1. open": string;
     "2. high": string;
     "3. low": string;

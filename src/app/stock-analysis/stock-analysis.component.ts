@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import {
@@ -12,27 +12,14 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { ApexOptions } from "src/@vex/components/chart/chart.component";
 import { defaultChartOptions } from "src/@vex/utils/default-chart-options";
-import { StockAnalysisService } from "../services/stock-analysis.service";
-import { Stock } from "../models/stock.model";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { AppChartComponent } from "../chart/chart.component";
-import { AppTableComponent } from "../table/table.component";
+import { Stock, TimeSeries } from "../models/stock.model";
 import { TableDataModel } from "../models/tableData.model";
-
-type ApexAxisChartSeriesData =
-  | (number | null)[]
-  | {
-    x: any;
-    y: any;
-    fillColor?: string;
-    strokeColor?: string;
-    meta?: any;
-    goals?: any;
-  }[]
-  | [number, number | null][]
-  | [number, (number | null)[]][];
+import { StockAnalysisService } from "../services/stock-analysis.service";
+import { AppTableComponent } from "../table/table.component";
 
 @Component({
   selector: "vex-stock-analysis",
@@ -53,7 +40,7 @@ type ApexAxisChartSeriesData =
   templateUrl: "./stock-analysis.component.html",
   styleUrls: ["./stock-analysis.component.scss"],
 })
-export class StockAnalysisComponent {
+export class StockAnalysisComponent implements OnInit {
   stockForm = new FormGroup({
     stocks: new FormControl<string[]>([], Validators.required),
     start: new FormControl<Date>(null, Validators.required),
@@ -116,7 +103,9 @@ export class StockAnalysisComponent {
   constructor(
     private stockService: StockAnalysisService,
     private _snackBar: MatSnackBar
-  ) {
+  ) { }
+
+  ngOnInit() {
     this.min.setMonth(this.max.getMonth() - 2);
     this.stockList = this.stockService.getStockList();
   }
@@ -174,7 +163,10 @@ export class StockAnalysisComponent {
     return { name: symbol, data };
   }
 
-  private filterAndTransformData(dailyData: any, labels?: string[]): number[] {
+  private filterAndTransformData(
+    dailyData: { [key: string]: TimeSeries },
+    labels?: string[]
+  ): number[] {
     return Object.keys(dailyData)
       .filter((date) =>
         this.isDateWithinRange(
