@@ -125,11 +125,13 @@ export class StockAnalysisComponent implements OnInit {
   }
 
   private handleData(data: Stock[]): void {
-    const labels: string[] = [];
+    let labels: string[] = [];
     this.series = this.mapDataToSeries(data, labels);
 
-    if (this.series.length === 0) {
+    if (this.series.includes(undefined)) {
       this.showSnackBar();
+      this.series = [];
+      labels = [];
     }
 
     this.options.labels = [...labels];
@@ -144,14 +146,13 @@ export class StockAnalysisComponent implements OnInit {
       .map((stockData, index) =>
         this.getStockSeries(stockData, index === 0 ? labels : undefined)
       )
-      .filter((series) => series !== undefined);
   }
 
   private getStockSeries(
     stockData: Stock,
     labels?: string[]
   ): { name: string; data: number[] } {
-    if (stockData["Information"]) {
+    if (stockData["Information"] || stockData["Note"]) {
       return undefined;
     }
 

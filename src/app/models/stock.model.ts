@@ -2,6 +2,7 @@ export interface Stock {
     "Meta Data": MetaData;
     "Time Series (Daily)": { [key: string]: TimeSeries };
     "Information"?: string;
+    "Note"?: string;
 }
 
 export interface MetaData {
