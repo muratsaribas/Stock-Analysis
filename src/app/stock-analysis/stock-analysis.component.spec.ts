@@ -2,12 +2,12 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { StockAnalysisComponent } from "./stock-analysis.component";
 import { StockAnalysisService } from "../services/stock-analysis.service";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { TableDataModel } from "../models/tableData.model";
 import { Stock } from "../models/stock.model";
-import { of } from "rxjs";
+import { of, throwError } from "rxjs";
 
 describe("StockAnalysisComponent", () => {
   let component: StockAnalysisComponent;
@@ -200,6 +200,43 @@ describe("StockAnalysisComponent", () => {
 
     expect(component.isLoading).toBeFalse();
     expect(component.labels.length).toBeGreaterThan(0);
+  });
+
+  it("should clear series and labels when the series includes undefined", () => {
+    const mockStocks = ["MSFT", "AAPL"];
+    const mockData: Stock[] = [
+      {
+        "Meta Data": {
+          "1. Information": "Test",
+          "2. Symbol": "MSFT",
+          "3. Last Refreshed": "",
+          "4. Output Size": "",
+          "5. Time Zone": "",
+        },
+        "Time Series (Daily)": {},
+        "Note": "test"
+      }
+    ];
+
+    component.stockForm.get("stocks").setValue(mockStocks);
+
+    component["handleData"](mockData);
+
+    expect(component.series).toEqual([]);
+    expect(component.labels).toEqual([]);
+  });
+
+  it("should log an error when getDashboardData fails", () => {
+    const mockStocks = ["MSFT", "AAPL"];
+
+    component.stockForm.get("stocks").setValue(mockStocks);
+    mockStockAnalysisService.getDashboardData.and.returnValue(throwError(() => new Error('test')));
+
+    spyOn(console, 'error');
+
+    component.show();
+
+    expect(console.error).toHaveBeenCalled();
   });
 
 });
