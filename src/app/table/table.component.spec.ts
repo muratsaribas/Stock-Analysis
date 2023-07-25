@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 
 import { AppTableComponent } from "./table.component";
-import { TableDataModel } from "../models/tableData.model";
 
 describe("TableComponent", () => {
   let component: AppTableComponent;
@@ -64,8 +63,8 @@ describe("TableComponent", () => {
 
   it("should get table data", () => {
     const mockTableData = [
-      { name: "name1", data: [0, 1] },
-      { name: "name2", data: [2, 3] },
+      { name: "name1", data: ["0", "1"] },
+      { name: "name2", data: ["2", "3"] },
     ];
     component.data = { tableHead: [], tableData: mockTableData };
 

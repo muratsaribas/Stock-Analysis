@@ -2,12 +2,12 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { StockAnalysisComponent } from "./stock-analysis.component";
 import { StockAnalysisService } from "../services/stock-analysis.service";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { TableDataModel } from "../models/tableData.model";
 import { Stock } from "../models/stock.model";
-import { of } from "rxjs";
+import { of, throwError } from "rxjs";
 
 describe("StockAnalysisComponent", () => {
   let component: StockAnalysisComponent;
@@ -27,13 +27,13 @@ describe("StockAnalysisComponent", () => {
         "1. open": "",
         "2. high": "",
         "3. low": "",
-        "4. close": "140.00",
+        "4. close": "140.0000",
       },
       "2023-07-21": {
         "1. open": "",
         "2. high": "",
         "3. low": "",
-        "4. close": "138.00",
+        "4. close": "138.0000",
       },
     },
   };
@@ -94,22 +94,23 @@ describe("StockAnalysisComponent", () => {
   });
 
   it("should return labels", () => {
-    component.options.labels = ["label1", "label2", "label3"];
+    component.labels = ["label1", "label2", "label3"];
 
     expect(component["getLabels"]()).toEqual(["label1", "label2", "label3"]);
   });
 
   it("should return table data", () => {
-    component.options.labels = ["label1", "label2", "label3"];
+    component.labels = ["label1", "label2", "label3"];
     component.series = [
-      { name: "series1", data: [1, 2, 3] },
-      { name: "series2", data: [4, 5, 6] },
+      { seriesname: "series1", data: [{ value: "0" }, { value: "1" }, { value: "2" }] },
+      { seriesname: "series2", data: [{ value: "4" }, { value: "5" }, { value: "6" }] },
     ];
+
     const expectedTableData: TableDataModel = {
-      tableHead: ["label3", "label2", "label1"],
+      tableHead: ["label1", "label2", "label3"],
       tableData: [
-        { name: "series1", data: [3, 2, 1] },
-        { name: "series2", data: [6, 5, 4] },
+        { name: "series1", data: ["0", "1", "2"] },
+        { name: "series2", data: ["4", "5", "6"] },
       ],
     };
 
@@ -120,14 +121,15 @@ describe("StockAnalysisComponent", () => {
     const labels: string[] = [];
     const series = component["mapDataToSeries"]([stockData], labels);
 
-    expect(series).toEqual([{ name: "MSFT", data: [140, 138] }]);
+    expect(series).toEqual([{ seriesname: "MSFT", data: [{ value: "138.00" }, { value: "140.00" }] }]);
+
     expect(labels).toEqual(["2023-07-22", "2023-07-21"]);
   });
 
   it("should get stock series", () => {
     const series = component["getStockSeries"](stockData);
 
-    expect(series).toEqual({ name: "MSFT", data: [140, 138] });
+    expect(series).toEqual({ seriesname: "MSFT", data: [{ value: "138.00" }, { value: "140.00" }] });
   });
 
   it("should filter and transform data", () => {
@@ -137,7 +139,7 @@ describe("StockAnalysisComponent", () => {
       stockData["Time Series (Daily)"]
     );
 
-    expect(data).toEqual([140, 138]);
+    expect(data).toEqual([{ value: "140.00" }, { value: "138.00" }]);
   });
 
   it("should handle data correctly", () => {
@@ -197,7 +199,44 @@ describe("StockAnalysisComponent", () => {
     component.show();
 
     expect(component.isLoading).toBeFalse();
-    expect(component.options.labels.length).toBeGreaterThan(0);
+    expect(component.labels.length).toBeGreaterThan(0);
+  });
+
+  it("should clear series and labels when the series includes undefined", () => {
+    const mockStocks = ["MSFT", "AAPL"];
+    const mockData: Stock[] = [
+      {
+        "Meta Data": {
+          "1. Information": "Test",
+          "2. Symbol": "MSFT",
+          "3. Last Refreshed": "",
+          "4. Output Size": "",
+          "5. Time Zone": "",
+        },
+        "Time Series (Daily)": {},
+        "Note": "test"
+      }
+    ];
+
+    component.stockForm.get("stocks").setValue(mockStocks);
+
+    component["handleData"](mockData);
+
+    expect(component.series).toEqual([]);
+    expect(component.labels).toEqual([]);
+  });
+
+  it("should log an error when getDashboardData fails", () => {
+    const mockStocks = ["MSFT", "AAPL"];
+
+    component.stockForm.get("stocks").setValue(mockStocks);
+    mockStockAnalysisService.getDashboardData.and.returnValue(throwError(() => new Error('test')));
+
+    spyOn(console, 'error');
+
+    component.show();
+
+    expect(console.error).toHaveBeenCalled();
   });
 
 });

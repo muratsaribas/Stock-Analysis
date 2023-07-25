@@ -69,11 +69,7 @@
   </div>
 
   <div class="card">
-    <app-vex-chart
-      [options]="options"
-      [series]="series"
-      [skeleton]="isLoading"
-    ></app-vex-chart>
+    <app-fusion-chart [skeleton]="isLoading" [categories]="labels" [series]="series"></app-fusion-chart>
   </div>
 
   <div class="card w-full flex items-center justify-between gap-4 flex-col">
