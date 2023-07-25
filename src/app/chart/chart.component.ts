@@ -1,21 +1,66 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ChartModule } from "src/@vex/components/chart/chart.module";
-import { ApexOptions } from "src/@vex/components/chart/chart.component";
+
+import { FusionChartsModule } from "angular-fusioncharts";
+
+// Load FusionCharts
+import * as FusionCharts from "fusioncharts";
+// Load Charts module
+import * as Charts from "fusioncharts/fusioncharts.charts";
+// Load fusion theme
+import * as FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+
+// Add dependencies to FusionChartsModule
+FusionChartsModule.fcRoot(FusionCharts, Charts, FusionTheme);
 
 @Component({
-  selector: "app-vex-chart",
+  selector: "app-fusion-chart",
   standalone: true,
-  imports: [CommonModule, ChartModule],
+  imports: [CommonModule, FusionChartsModule],
   templateUrl: "./chart.component.html",
   styleUrls: ["./chart.component.scss"],
 })
-export class AppChartComponent {
-  @Input() options!: ApexOptions;
-
-  @Input() series!: ApexAxisChartSeries | ApexNonAxisChartSeries;
-
+export class AppChartComponent implements OnChanges {
   @Input() skeleton!: boolean;
 
+  @Input() series!: { seriesname: string; data: { value: string }[] }[];
+
+  @Input() categories!: string[];
+
+  width = "100%";
+
+  height = "400";
+
+  type = "msline";
+
+  dataFormat = "json";
+
+  dataSource = {
+    chart: {
+      showHoverEffect: "1",
+      drawCrossLine: "1",
+      theme: "fusion",
+    },
+    categories: [
+      {
+        category: [],
+      },
+    ],
+    dataset: [],
+  };
+
   constructor() { }
+
+  ngOnChanges(): void {
+    this.dataSource.dataset = this.series;
+    this.dataSource.categories[0].category = this.convertToCategories(
+      this.categories
+    );
+  }
+
+  private convertToCategories(stringArr: string[]): { label: string }[] {
+    return stringArr.map((label) => {
+      return { label };
+    });
+  }
 }

@@ -13,13 +13,13 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
-import { ApexOptions } from "src/@vex/components/chart/chart.component";
-import { defaultChartOptions } from "src/@vex/utils/default-chart-options";
 import { AppChartComponent } from "../chart/chart.component";
 import { Stock, TimeSeries } from "../models/stock.model";
 import { TableDataModel } from "../models/tableData.model";
 import { StockAnalysisService } from "../services/stock-analysis.service";
 import { AppTableComponent } from "../table/table.component";
+
+type StockSeries = { seriesname: string, data: { value: string }[] };
 
 @Component({
   selector: "vex-stock-analysis",
@@ -35,7 +35,7 @@ import { AppTableComponent } from "../table/table.component";
     MatNativeDateModule,
     MatSnackBarModule,
     AppChartComponent,
-    AppTableComponent,
+    AppTableComponent
   ],
   templateUrl: "./stock-analysis.component.html",
   styleUrls: ["./stock-analysis.component.scss"],
@@ -53,50 +53,9 @@ export class StockAnalysisComponent implements OnInit {
 
   max = new Date();
 
-  options: ApexOptions = defaultChartOptions({
-    grid: {
-      show: true,
-      strokeDashArray: 3,
-      padding: {
-        left: 16,
-      },
-    },
-    chart: {
-      type: "line",
-      height: 300,
-      sparkline: {
-        enabled: false,
-      },
-      zoom: {
-        enabled: false,
-      },
-    },
-    stroke: {
-      width: 4,
-    },
-    labels: [],
-    xaxis: {
-      type: "datetime",
-      labels: {
-        show: true,
-      },
-    },
-    yaxis: {
-      decimalsInFloat: 2,
-      labels: {
-        show: true,
-      },
-    },
-    legend: {
-      show: true,
-      itemMargin: {
-        horizontal: 4,
-        vertical: 4,
-      },
-    },
-  });
+  series: StockSeries[] = [];
 
-  series: ApexAxisChartSeries = [];
+  labels: string[] = [];
 
   isLoading = false;
 
@@ -134,14 +93,14 @@ export class StockAnalysisComponent implements OnInit {
       labels = [];
     }
 
-    this.options.labels = [...labels];
+    this.labels = [...labels.reverse()];
     this.isLoading = false;
   }
 
   private mapDataToSeries(
     data: Stock[],
     labels: string[]
-  ): { name: string; data: number[] }[] {
+  ): StockSeries[] {
     return data
       .map((stockData, index) =>
         this.getStockSeries(stockData, index === 0 ? labels : undefined)
@@ -151,7 +110,7 @@ export class StockAnalysisComponent implements OnInit {
   private getStockSeries(
     stockData: Stock,
     labels?: string[]
-  ): { name: string; data: number[] } {
+  ): StockSeries {
     if (stockData["Information"] || stockData["Note"]) {
       return undefined;
     }
@@ -159,15 +118,15 @@ export class StockAnalysisComponent implements OnInit {
     const symbol = stockData["Meta Data"]["2. Symbol"];
     const dailyData = stockData["Time Series (Daily)"];
 
-    const data = this.filterAndTransformData(dailyData, labels);
+    const data = this.filterAndTransformData(dailyData, labels).reverse();
 
-    return { name: symbol, data };
+    return { seriesname: symbol, data };
   }
 
   private filterAndTransformData(
     dailyData: { [key: string]: TimeSeries },
     labels?: string[]
-  ): number[] {
+  ): { value: string }[] {
     return Object.keys(dailyData)
       .filter((date) =>
         this.isDateWithinRange(
@@ -178,19 +137,19 @@ export class StockAnalysisComponent implements OnInit {
       )
       .map((date) => {
         labels?.push(date);
-        return +dailyData[date]["4. close"];
+        return { value: dailyData[date]["4. close"].slice(0, -2) };
       });
   }
 
   private getLabels(): string[] {
-    return this.options.labels as string[];
+    return this.labels;
   }
 
   getTableData(): TableDataModel {
-    const tableHead = this.getLabels().reverse();
-    const tableData = this.series.map(({ name, data }) => ({
-      name,
-      data: (data as number[]).reverse(),
+    const tableHead = this.getLabels();
+    const tableData = this.series.map(({ seriesname, data }) => ({
+      name: seriesname,
+      data: data.map(item => item.value),
     }));
 
     return { tableHead, tableData };

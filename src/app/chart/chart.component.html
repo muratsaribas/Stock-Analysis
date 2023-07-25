@@ -6,5 +6,12 @@
 </ng-container>
 
 <ng-template #chartTemplate>
-  <vex-chart [options]="options" [series]="series"></vex-chart>
+  <fusioncharts
+      [width]="width"
+      [height]="height"
+      [type]="type"
+      [dataFormat]="dataFormat"
+      [dataSource]="dataSource"
+    >
+    </fusioncharts>
 </ng-template>
